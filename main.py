@@ -1,22 +1,25 @@
 import oandapyV20
 import oandapyV20.endpoints.orders as orders
 import oandapyV20.endpoints.pricing as pricing
-from oandapyV20.types import StopLossDetails, TakeProfitDetails
-from oandapyV20.types import OrderPositionFill
+import os
 import time
+from dotenv import load_dotenv
 
-# OANDA API Configuration
-API_KEY = "YOUR_OANDA_API_KEY"
-ACCOUNT_ID = "YOUR_ACCOUNT_ID"
-OANDA_URL = "https://api-fxpractice.oanda.com/v3"  # Practice account URL
+# Load environment variables from a .env file (if using environment variables)
+load_dotenv()
+
+# OANDA API Configuration - Ensure the variables are loaded securely
+API_KEY = os.getenv('OANDA_API_KEY')  # Set your OANDA API Key in environment or input at runtime
+ACCOUNT_ID = os.getenv('OANDA_ACCOUNT_ID')  # Set your OANDA Account ID in environment or input at runtime
+OANDA_URL = "https://api-fxpractice.oanda.com/v3"  # Use practice account for testing
 client = oandapyV20.API(access_token=API_KEY)
 
 # Grid trading bot parameters
 symbol = "EUR_USD"  # Forex trading pair
-lower_price = 1.05  # Lower limit of the grid
-upper_price = 1.15  # Upper limit of the grid
-grid_levels = 10  # Number of grid levels
-capital = 1000  # Total capital (in base currency, e.g., USD)
+lower_price = float(input("Enter lower price for grid: "))  # User input
+upper_price = float(input("Enter upper price for grid: "))  # User input
+grid_levels = int(input("Enter number of grid levels: "))  # User input
+capital = float(input("Enter your capital in base currency (e.g., GBP): "))  # User input
 grid_size = (upper_price - lower_price) / grid_levels  # Price range for each grid level
 trade_size = capital / grid_levels  # Trade size per grid (adjust for margin)
 
