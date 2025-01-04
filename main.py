@@ -42,18 +42,40 @@ def get_current_price(instrument):
 
 
 # Function to place a trade
+# New user inputs for stop-loss and take-profit distances
+sl_distance = float(input("Enter stop-loss distance (in pips): "))  # Distance from entry price
+tp_distance = float(input("Enter take-profit distance (in pips): "))  # Distance from entry price
+
+
+# Function to calculate SL and TP prices
+def calculate_sl_tp(entry_price, is_buy):
+    sl_price = entry_price - (sl_distance / 10000) if is_buy else entry_price + (sl_distance / 10000)
+    tp_price = entry_price + (tp_distance / 10000) if is_buy else entry_price - (tp_distance / 10000)
+    return round(sl_price, 5), round(tp_price, 5)
+
+
+# Updated place_trade function to include SL and TP
 def place_trade(instrument, price, units, order_type):
     try:
+        is_buy = units > 0
+        sl_price, tp_price = calculate_sl_tp(price, is_buy)
         order = {
             "order": {
                 "instrument": instrument,
                 "units": str(units),
                 "type": "LIMIT",
                 "price": str(price),
-                "positionFill": "DEFAULT"
+                "positionFill": "DEFAULT",
+                "stopLossOnFill": {
+                    "price": str(sl_price)
+                },
+                "takeProfitOnFill": {
+                    "price": str(tp_price)
+                }
             }
         }
-        print(f"Placing {order_type.upper()} order for {units} units at price {price}")
+        print(f"Placing {order_type.upper()} order for {units} units at price {price} "
+              f"with SL: {sl_price}, TP: {tp_price}")
         client.request(orders.OrderCreate(accountID=ACCOUNT_ID, data=order))
     except Exception as e:
         print(f"Error placing trade: {e}")
